@@ -16,9 +16,28 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style id="theme-styles">
+         @font-face {
+        font-family: 'MyCustomFont';
+        src: url('myfont.ttf') format('truetype');
+    }
+
+    :root {
+        --main-bg: #F5EBE0; 
+        --accent: #6B90B5;  
+        --soft-pink: #F2CCDB;
+        --text-main: #4A3F35; 
+        --text-muted: #8E8276;
+    }
+
+    .main-title { 
+        font-family: 'MyCustomFont', "Times New Roman", serif; 
+        font-style: italic; 
+        font-weight: 900; 
+        text-transform: none; 
+    }
         @font-face {
     font-family: 'CustomTitleFont';
-    src: url('myfont.ttf') format('truetype'); /* use 'opentype' if it's .otf */
+    src: url('myfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
