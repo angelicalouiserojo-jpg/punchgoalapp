@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PunchGoal | ✨ Sandy Aura</title>
+    <title>PunchGoal | ✨ Earn Rewards for Your Goals </title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -16,10 +16,8 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style id="theme-styles">
-        /* CUSTOM FONT LOADING */
         @font-face {
             font-family: 'PunchGoalFont';
-            /* NOTE: Ensure your file on GitHub is named brandfont.ttf or brandfont.otf */
             src: url('brandfont.ttf') format('truetype'),
                  url('brandfont.otf') format('opentype');
             font-weight: normal;
@@ -48,7 +46,7 @@
             font-family: 'PunchGoalFont', "Times New Roman", serif; 
             font-weight: 900; 
             text-transform: none; 
-            /* I removed 'italic' so your custom font shows its true shape */
+
         }
 
         .daily-motivation {
@@ -106,7 +104,7 @@
     <div id="appContent">
         <div id="welcomeScreen" class="fixed inset-0 z-[3000] flex items-center justify-center p-6">
             <div class="glass w-full max-w-sm rounded-[3rem] p-10 text-center float-in">
-                <h2 class="main-title text-4xl mb-2">Punchgoal</h2>
+                <h2 class="main-title text-4xl mb-2">welcome punchgoal.</h2>
                 <p class="text-sm font-bold opacity-60 mb-8">What should we call you?</p>
                 <input type="text" id="userNameInput" placeholder="Enter name..." class="unified-input text-center mb-6">
                 <button onclick="goToNotifications()" class="w-full bg-[#F5EBE0] text-[#6B90B5] border border-[#6B90B5]/20 py-4 rounded-xl shadow-lg font-black uppercase italic">Continue</button>
