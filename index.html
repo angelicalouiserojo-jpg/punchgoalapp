@@ -3,44 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PunchGoal | ✨ Get Rewards for Your Goals</title>
+    <title>PunchGoal | ✨ Sandy Aura</title>
     
-   <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PunchGoal">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
+    <link rel="apple-touch-icon" href="icon.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style id="theme-styles">
-         @font-face {
-        font-family: 'MyCustomFont';
-        src: url('myfont.ttf') format('truetype');
-    }
-
-    :root {
-        --main-bg: #F5EBE0; 
-        --accent: #6B90B5;  
-        --soft-pink: #F2CCDB;
-        --text-main: #4A3F35; 
-        --text-muted: #8E8276;
-    }
-
-    .main-title { 
-        font-family: 'MyCustomFont', "Times New Roman", serif; 
-        font-style: italic; 
-        font-weight: 900; 
-        text-transform: none; 
-    }
+        /* CUSTOM FONT LOADING */
         @font-face {
-    font-family: 'CustomTitleFont';
-    src: url('myfont.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
+            font-family: 'PunchGoalFont';
+            /* NOTE: Ensure your file on GitHub is named brandfont.ttf or brandfont.otf */
+            src: url('brandfont.ttf') format('truetype'),
+                 url('brandfont.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
         :root {
             --main-bg: #F5EBE0; 
             --accent: #6B90B5;  
@@ -59,6 +44,13 @@
             transition: background-color 0.5s ease;
         }
 
+        .main-title { 
+            font-family: 'PunchGoalFont', "Times New Roman", serif; 
+            font-weight: 900; 
+            text-transform: none; 
+            /* I removed 'italic' so your custom font shows its true shape */
+        }
+
         .daily-motivation {
             font-family: "Arial", sans-serif;
             font-size: 0.75rem;
@@ -71,7 +63,6 @@
             text-align: center;
         }
 
-        .main-title { font-family: "Times New Roman", Times, serif; font-style: italic; font-weight: 900; }
         .bg-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: var(--main-bg); }
         .aura-blob { position: absolute; filter: blur(100px); border-radius: 50%; opacity: 0.6; animation: drift 25s infinite alternate ease-in-out; }
         .blob-pink { background: var(--soft-pink); width: 600px; height: 600px; top: -10%; right: -10%; }
@@ -115,7 +106,7 @@
     <div id="appContent">
         <div id="welcomeScreen" class="fixed inset-0 z-[3000] flex items-center justify-center p-6">
             <div class="glass w-full max-w-sm rounded-[3rem] p-10 text-center float-in">
-                <h2 class="main-title text-4xl italic mb-2">Punchgoal</h2>
+                <h2 class="main-title text-4xl mb-2">Punchgoal</h2>
                 <p class="text-sm font-bold opacity-60 mb-8">What should we call you?</p>
                 <input type="text" id="userNameInput" placeholder="Enter name..." class="unified-input text-center mb-6">
                 <button onclick="goToNotifications()" class="w-full bg-[#F5EBE0] text-[#6B90B5] border border-[#6B90B5]/20 py-4 rounded-xl shadow-lg font-black uppercase italic">Continue</button>
@@ -201,7 +192,7 @@
     </div>
 
     <script>
-        let appData = JSON.parse(localStorage.getItem('punchgoal_v10')) || { 
+        let appData = JSON.parse(localStorage.getItem('punchgoal_v11')) || { 
             user: null, goals: [], theme: { bg: '#F5EBE0', accent: '#6B90B5', pink: '#F2CCDB' }
         };
 
@@ -319,7 +310,7 @@
             lucide.createIcons();
         }
 
-        function saveAndRender() { localStorage.setItem('punchgoal_v10', JSON.stringify(appData)); renderDashboard(); }
+        function saveAndRender() { localStorage.setItem('punchgoal_v11', JSON.stringify(appData)); renderDashboard(); }
         function toggleModal(s) { s ? document.getElementById('addModal').classList.remove('hidden-screen') : document.getElementById('addModal').classList.add('hidden-screen'); }
         function openAddModal() { toggleModal(true); }
         function updateDurationLabel(val) { document.getElementById('durationValue').innerText = val + " Punches"; }
