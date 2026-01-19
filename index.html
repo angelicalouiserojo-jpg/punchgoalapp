@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PunchGoal | ✨ Sandy Aura</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PunchGoal">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3176/3176298.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style id="theme-styles">
+        :root {
+            --main-bg: #F5EBE0; 
+            --accent: #6B90B5;  
+            --soft-pink: #F2CCDB;
+            --text-main: #4A3F35; 
+            --text-muted: #8E8276;
+        }
+
+        body {
+            font-family: "Arial", sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text-main);
+            background-color: var(--main-bg);
+            overflow-x: hidden;
+            transition: background-color 0.5s ease;
+        }
+
+        .daily-motivation {
+            font-family: "Arial", sans-serif;
+            font-size: 0.75rem;
+            font-style: italic;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        .main-title { font-family: "Times New Roman", Times, serif; font-style: italic; font-weight: 900; }
+        .bg-wrapper { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: var(--main-bg); }
+        .aura-blob { position: absolute; filter: blur(100px); border-radius: 50%; opacity: 0.6; animation: drift 25s infinite alternate ease-in-out; }
+        .blob-pink { background: var(--soft-pink); width: 600px; height: 600px; top: -10%; right: -10%; }
+        .blob-blue { background: var(--accent); width: 500px; height: 500px; bottom: -10%; left: -5%; }
+        
+        .grain-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 0.04; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"); }
+        @keyframes drift { from { transform: translate(0, 0) scale(1); } to { transform: translate(-100px, 150px) scale(1.2); } }
+
+        .glass { background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.6); }
+        .hidden-screen { display: none !important; }
+        .float-in { animation: floatUp 0.6s ease-out forwards; }
+        @keyframes floatUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .input-label { font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); margin-bottom: 4px; display: block; }
+        .unified-input { width: 100%; background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(0, 0, 0, 0.05); border-radius: 0.85rem; padding: 0.85rem 1rem; font-size: 0.9rem; font-weight: 700; color: var(--text-main); outline: none; }
+        
+        .cat-tile { padding: 12px; border-radius: 1rem; border: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.3); font-size: 0.7rem; font-weight: 800; text-transform: uppercase; text-align: center; cursor: pointer; }
+        .cat-tile.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+        .punched { background: white !important; transform: scale(1.1) rotate(5deg); box-shadow: 0 4px 15px rgba(107, 144, 181, 0.3); }
+        .badge { display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; background: white; border: 1px solid var(--accent); }
+
+        .guide-arrow { animation: arrowBounce 1.5s infinite ease-in-out; color: var(--accent); }
+        @keyframes arrowBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+
+        /* Tan Duration Bar with Black Outline */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { 
+            width: 100%; height: 10px; background: #F5EBE0; border-radius: 10px; border: 1.5px solid #000000;
+        }
+        input[type=range]::-webkit-slider-thumb { 
+            -webkit-appearance: none; height: 22px; width: 22px; border-radius: 50%; background: var(--accent); cursor: pointer; margin-top: -7.5px; border: 1.5px solid #000000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-wrapper"><div class="aura-blob blob-pink"></div><div class="aura-blob blob-blue"></div></div>
+    <div class="grain-overlay"></div>
+
+    <div id="appContent">
+        <div id="welcomeScreen" class="fixed inset-0 z-[3000] flex items-center justify-center p-6">
+            <div class="glass w-full max-w-sm rounded-[3rem] p-10 text-center float-in">
+                <h2 class="main-title text-4xl italic mb-2">Punchgoal</h2>
+                <p class="text-sm font-bold opacity-60 mb-8">What should we call you?</p>
+                <input type="text" id="userNameInput" placeholder="Enter name..." class="unified-input text-center mb-6">
+                <button onclick="goToNotifications()" class="w-full bg-[#F5EBE0] text-[#6B90B5] border border-[#6B90B5]/20 py-4 rounded-xl shadow-lg font-black uppercase italic">Continue</button>
+            </div>
+        </div>
+
+        <div id="notifOnboarding" class="fixed inset-0 z-[3001] hidden-screen flex items-center justify-center p-6">
+            <div class="glass w-full max-w-sm rounded-[3rem] p-10 text-center float-in">
+                <div class="flex justify-center mb-4"><i data-lucide="bell" class="text-[#6B90B5] w-12 h-12"></i></div>
+                <h2 class="text-xl font-black uppercase mb-2">Stay on track</h2>
+                <p class="text-xs font-bold opacity-60 mb-8 leading-relaxed">We'll check in with you twice a day to help you crush your goals.</p>
+                <button onclick="enableNotifs()" class="w-full bg-[#6B90B5] text-white py-4 rounded-xl shadow-lg font-black uppercase italic mb-3">Enable Notifications</button>
+                <button onclick="finishOnboarding()" class="text-[10px] font-bold opacity-40 uppercase tracking-widest">Maybe Later</button>
+            </div>
+        </div>
+
+        <div id="milestonePopup" class="fixed inset-0 z-[5000] hidden-screen flex items-center justify-center p-6 bg-black/30 backdrop-blur-md">
+            <div class="glass w-full max-w-sm rounded-[3rem] p-10 text-center float-in border border-white/50">
+                <div id="m-popup-icon" class="text-6xl mb-4 animate-bounce">🌱</div>
+                <h2 id="m-popup-title" class="text-2xl font-black italic uppercase mb-2">Milestone!</h2>
+                <p id="m-popup-body" class="text-sm font-bold opacity-70 mb-8 leading-relaxed"></p>
+                <button onclick="closeMilestonePopup()" class="w-full py-4 rounded-xl font-black uppercase italic bg-[#F5EBE0] text-[#6B90B5] border border-[#6B90B5]/20 shadow-lg">Heck Yes! ✨</button>
+            </div>
+        </div>
+
+        <div id="mainApp" class="hidden-screen p-6 max-w-md mx-auto">
+            <header class="mt-4 mb-10 text-center">
+                <p id="dailyMotivationQuote" class="daily-motivation"></p>
+            </header>
+            <div id="goalsContainer"></div>
+        </div>
+
+        <div id="profileTab" class="hidden-screen p-6 max-w-md mx-auto">
+            <div class="glass rounded-[2.5rem] p-8 text-center float-in">
+                <h2 class="text-2xl font-black italic uppercase mb-6">Profile</h2>
+                <p class="input-label text-center">Choose Theme</p>
+                <div class="flex justify-center gap-4 mb-10">
+                    <div onclick="setTheme('#F5EBE0', '#6B90B5', '#F2CCDB')" class="w-8 h-8 rounded-full border-2 border-white cursor-pointer" style="background: #F5EBE0;"></div>
+                    <div onclick="setTheme('#E0F5F5', '#6BA7B5', '#CCEBF2')" class="w-8 h-8 rounded-full border-2 border-white cursor-pointer" style="background: #E0F5F5;"></div>
+                    <div onclick="setTheme('#EBE0F5', '#8C6BB5', '#E1CCF2')" class="w-8 h-8 rounded-full border-2 border-white cursor-pointer" style="background: #EBE0F5;"></div>
+                </div>
+                <div class="border-t border-black/5 pt-6">
+                    <button onclick="referFriend()" class="flex items-center justify-center gap-2 w-full text-sm font-bold opacity-60">
+                        <i data-lucide="share-2" class="w-4 h-4"></i> Refer a Friend
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="addModal" class="fixed inset-0 z-[2000] hidden-screen flex items-center justify-center p-6 bg-black/10 backdrop-blur-md">
+            <div class="glass w-full max-w-sm rounded-[2.5rem] p-8 relative max-h-[90vh] overflow-y-auto">
+                <button onclick="toggleModal(false)" class="absolute top-6 right-6 opacity-40"><i data-lucide="x"></i></button>
+                <h2 class="text-xl font-black italic mb-6 uppercase">New Goal Card</h2>
+                <div class="space-y-6">
+                    <div>
+                        <label class="input-label">Pick a Category</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <div onclick="selectTile('General', this)" class="cat-tile active">General</div>
+                            <div onclick="selectTile('Fitness', this)" class="cat-tile">Fitness</div>
+                            <div onclick="selectTile('Finance', this)" class="cat-tile">Finance</div>
+                            <div onclick="selectTile('Work', this)" class="cat-tile">Work</div>
+                            <div onclick="selectTile('Health', this)" class="cat-tile">Health</div>
+                            <div onclick="selectTile('Social', this)" class="cat-tile">Social</div>
+                        </div>
+                    </div>
+                    <div><label class="input-label">What is your goal?</label><input type="text" id="modalGoalTitle" class="unified-input" placeholder="e.g. Morning Yoga"></div>
+                    <div><label class="input-label">What is your reward?</label><input type="text" id="modalReward" class="unified-input" placeholder="e.g. Iced Coffee"></div>
+                    <div><label class="input-label">Reward Link (Optional)</label><input type="url" id="modalRewardLink" class="unified-input" placeholder="https://amazon.com"></div>
+                    <div>
+                        <div class="flex justify-between mb-2"><label class="input-label">Duration</label><p class="text-xs font-black uppercase" id="durationValue">7 Punches</p></div>
+                        <input type="range" id="durationSlider" min="7" max="30" value="7" class="w-full" oninput="updateDurationLabel(this.value)">
+                    </div>
+                    <button onclick="saveGoal()" class="w-full py-4 rounded-xl font-black uppercase italic bg-[#F5EBE0] text-[#6B90B5] border border-[#6B90B5]/20 mt-4">Create Card ✨</button>
+                </div>
+            </div>
+        </div>
+
+        <nav id="bottomNav" class="hidden-screen fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm glass rounded-full p-4 flex justify-around items-center z-[1500]">
+            <button onclick="showScreen('mainApp')" id="nav-home" class="text-[#6B90B5]"><i data-lucide="home"></i></button>
+            <button onclick="openAddModal()" class="bg-[#F5EBE0] border border-[#6B90B5]/30 p-3 rounded-full -mt-12 shadow-xl text-[#6B90B5]"><i data-lucide="plus"></i></button>
+            <button onclick="showScreen('profileTab')" id="nav-profile" class="opacity-60 text-[#6B90B5]"><i data-lucide="user"></i></button>
+        </nav>
+    </div>
+
+    <script>
+        let appData = JSON.parse(localStorage.getItem('punchgoal_v10')) || { 
+            user: null, goals: [], theme: { bg: '#F5EBE0', accent: '#6B90B5', pink: '#F2CCDB' }
+        };
+
+        const motivations = ["Done is better than perfect.", "Motivation gets you started.", "Small steps, big impact."];
+        let currentCategory = "General";
+
+        function goToNotifications() {
+            const name = document.getElementById('userNameInput').value.trim();
+            if (!name) return alert("Enter your name!");
+            appData.user = name;
+            document.getElementById('welcomeScreen').classList.add('hidden-screen');
+            document.getElementById('notifOnboarding').classList.remove('hidden-screen');
+            lucide.createIcons();
+        }
+
+        function enableNotifs() { alert("Notifications enabled!"); finishOnboarding(); }
+        function finishOnboarding() { document.getElementById('notifOnboarding').classList.add('hidden-screen'); saveAndRender(); }
+
+        function showMilestonePopup(icon, title, body) {
+            document.getElementById('m-popup-icon').innerText = icon;
+            document.getElementById('m-popup-title').innerText = title;
+            document.getElementById('m-popup-body').innerText = body;
+            document.getElementById('milestonePopup').classList.remove('hidden-screen');
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: [appData.theme.accent, '#FFFFFF'] });
+        }
+
+        function closeMilestonePopup() { document.getElementById('milestonePopup').classList.add('hidden-screen'); }
+
+        function selectTile(cat, el) {
+            currentCategory = cat;
+            document.querySelectorAll('.cat-tile').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function setTheme(bg, acc, pink) {
+            appData.theme = { bg, acc, pink };
+            document.documentElement.style.setProperty('--main-bg', bg);
+            document.documentElement.style.setProperty('--accent', acc);
+            document.documentElement.style.setProperty('--soft-pink', pink);
+            saveAndRender();
+        }
+
+        function saveGoal() {
+            const title = document.getElementById('modalGoalTitle').value.trim() || "My Goal";
+            const reward = document.getElementById('modalReward').value.trim() || "Reward";
+            const rewardLink = document.getElementById('modalRewardLink').value.trim();
+            const duration = parseInt(document.getElementById('durationSlider').value);
+            appData.goals.push({ 
+                id: Date.now(), title, reward, rewardLink, category: currentCategory, duration, 
+                punches: Array(duration).fill(false),
+                milestones: { first: false, sixty: false, done: false }
+            });
+            saveAndRender();
+            toggleModal(false);
+        }
+
+        function punch(goalId, idx) {
+            const goal = appData.goals.find(g => g.id === goalId);
+            const isPunching = !goal.punches[idx];
+            goal.punches[idx] = isPunching;
+
+            if (isPunching) {
+                confetti({ particleCount: 30, spread: 40, colors: [appData.theme.accent] });
+                const count = goal.punches.filter(p => p).length;
+                const progress = (count / goal.duration) * 100;
+
+                if (!goal.milestones.first && count === 1) {
+                    goal.milestones.first = true;
+                    showMilestonePopup('🌱', 'First Punch!', 'Great start, bestie!');
+                } else if (!goal.milestones.sixty && progress >= 60 && progress < 100) {
+                    goal.milestones.sixty = true;
+                    showMilestonePopup('🚀', 'Almost There!', 'Over 60% done!');
+                } else if (!goal.milestones.done && progress === 100) {
+                    goal.milestones.done = true;
+                    showMilestonePopup('👑', 'Goal Smashed!', `Enjoy your ${goal.reward}!`);
+                }
+            }
+            saveAndRender();
+        }
+
+        function showScreen(screenId) {
+            ['mainApp', 'profileTab'].forEach(s => document.getElementById(s).classList.add('hidden-screen'));
+            document.getElementById(screenId).classList.remove('hidden-screen');
+            document.querySelectorAll('nav button').forEach(b => b.classList.add('opacity-60'));
+            const activeNav = screenId === 'mainApp' ? 'nav-home' : 'nav-profile';
+            document.getElementById(activeNav).classList.remove('opacity-60');
+        }
+
+        function renderDashboard() {
+            if (!appData.user) return;
+            document.getElementById('welcomeScreen').classList.add('hidden-screen');
+            document.getElementById('mainApp').classList.remove('hidden-screen');
+            document.getElementById('bottomNav').classList.remove('hidden-screen');
+            const dayOfYear = Math.floor((new Date() - new Date(new Date().getFullYear(), 0, 0)) / 1000 / 60 / 60 / 24);
+            document.getElementById('dailyMotivationQuote').innerText = `"${motivations[dayOfYear % motivations.length]}"`;
+            const container = document.getElementById('goalsContainer');
+            if (appData.goals.length === 0) {
+                container.innerHTML = `<div class="fixed inset-0 flex flex-col items-center justify-center text-center opacity-60 pointer-events-none"><i data-lucide="sparkles" class="w-10 h-10 mb-4 text-[#6B90B5]"></i><p class="font-bold text-lg">Let's get started! ✨</p><p class="text-sm max-w-[200px] mb-12">Tap the plus to create your first card.</p><div class="guide-arrow"><i data-lucide="chevron-down" class="w-8 h-8"></i></div></div>`;
+            } else {
+                container.innerHTML = appData.goals.map(g => `
+                    <div class="glass rounded-[2.5rem] p-6 mb-4 relative">
+                        <div class="flex justify-between items-start mb-3">
+                            <div><span class="text-[9px] font-bold opacity-40 uppercase tracking-widest">${g.category} • ${g.duration} Punches</span><h3 class="text-xl font-black uppercase">${g.title}</h3></div>
+                            <div class="flex gap-2">
+                                ${g.milestones.first ? `<div class="badge"><i data-lucide="sprout" class="w-3 h-3 text-green-600"></i></div>` : ''}
+                                ${g.milestones.sixty ? `<div class="badge"><i data-lucide="rocket" class="w-3 h-3 text-orange-500"></i></div>` : ''}
+                                ${g.milestones.done ? `<div class="badge" style="border-color: #FFD700"><i data-lucide="crown" class="w-3 h-3 text-yellow-500"></i></div>` : ''}
+                                <button onclick="deleteGoal(${g.id})" class="opacity-20 text-[#6B90B5] ml-2"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-7 gap-2 bg-white/20 p-4 rounded-2xl">${g.punches.map((p, idx) => `<div onclick="punch(${g.id}, ${idx})" class="aspect-square rounded-full border-2 border-dashed flex items-center justify-center cursor-pointer ${p ? 'punched' : 'bg-white/10'}" style="border-color: rgba(107, 144, 181, 0.2);">${p ? '💙' : ''}</div>`).join('')}</div>
+                        <div class="mt-4 text-center"><p class="text-[9px] font-black uppercase tracking-widest opacity-40">Reward: ${g.rewardLink ? `<a href="${g.rewardLink}" target="_blank" class="underline text-[#6B90B5]">${g.reward} 🔗</a>` : g.reward}</p></div>
+                    </div>`).join('');
+            }
+            lucide.createIcons();
+        }
+
+        function saveAndRender() { localStorage.setItem('punchgoal_v10', JSON.stringify(appData)); renderDashboard(); }
+        function toggleModal(s) { s ? document.getElementById('addModal').classList.remove('hidden-screen') : document.getElementById('addModal').classList.add('hidden-screen'); }
+        function openAddModal() { toggleModal(true); }
+        function updateDurationLabel(val) { document.getElementById('durationValue').innerText = val + " Punches"; }
+        function deleteGoal(id) { if(confirm("Remove goal?")) { appData.goals = appData.goals.filter(g => g.id !== id); saveAndRender(); } }
+        function referFriend() { alert("Link copied to clipboard!"); }
+
+        window.onload = () => { setTheme(appData.theme.bg, appData.theme.accent, appData.theme.pink); renderDashboard(); };
+
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(() => console.log("Service Worker Registered"));
+        }
+    </script>
+</body>
+</html>
